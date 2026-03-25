@@ -1,0 +1,22 @@
+{
+  "name": "build-qa-agent",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "requirements-review": "tsx src/requirementsReview.ts",
+    "requirements-completeness-review": "tsx src/requirementsCompletenessReview.ts",
+    "missing-states-review": "tsx src/missingStatesReview.ts",
+    "missing-validations-review": "tsx src/missingValidationsReview.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "openai": "^6.31.0",
+    "prettier": "^3.8.1",
+    "zod": "^4.3.6"
+  }
+}
