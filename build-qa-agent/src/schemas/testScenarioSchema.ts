@@ -13,13 +13,14 @@ export const TestScenarioSchema = z.object({
   expectedResult: z.string(),
   automationCandidate: z.boolean(),
   automationCandidateReason: z.string().optional(),
-  testSuite: z.enum(["smoke", "regression", "exploratory_follow_up"]).optional(),
+  testSuite: z
+    .enum(["smoke", "regression", "exploratory_follow_up"])
+    .optional(),
 
   preconditions: z.array(z.string()).optional(),
   testData: z.array(z.string()).optional(),
   notes: z.string().optional(),
   screenHint: z.string().optional(),
-  
 });
 
 export const TestScenarioListSchema = z.array(TestScenarioSchema);

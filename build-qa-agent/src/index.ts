@@ -45,6 +45,25 @@ function printReadableResult(result: FinalDorAssessment) {
     }
   }
 
+  if (result.consultedSources) {
+    console.log("\nGeraadpleegde bronnen:");
+    console.log(`- Jira: ${result.consultedSources.jira}`);
+
+    if (result.consultedSources.confluence.length > 0) {
+      console.log("- Confluence:");
+      for (const item of result.consultedSources.confluence) {
+        console.log(`  - ${item}`);
+      }
+    }
+
+    if (result.consultedSources.figma.length > 0) {
+      console.log("- Figma:");
+      for (const item of result.consultedSources.figma) {
+        console.log(`  - ${item}`);
+      }
+    }
+  }
+
   console.log("\nSterke punten:");
   const strengths = result.strengths.slice(0, 3);
   if (strengths.length === 0) {
@@ -84,10 +103,7 @@ function printReadableResult(result: FinalDorAssessment) {
     const grouped = groupScenariosBySuite(scenarios);
 
     // Doel: één groep testscenario's in consistente en op prioriteit gesorteerde vorm printen
-    const printScenarioGroup = (
-      title: string,
-      items: typeof scenarios,
-    ) => {
+    const printScenarioGroup = (title: string, items: typeof scenarios) => {
       if (items.length === 0) return;
 
       console.log(`\n${title}:`);

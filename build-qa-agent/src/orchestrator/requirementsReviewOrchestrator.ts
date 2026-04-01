@@ -8,7 +8,8 @@ import type {
 
 // Doel: orchestrator voor requirements review vóór Jira ticketcreatie
 export class RequirementsReviewOrchestrator {
-  private readonly requirementsAlignmentAgent = new RequirementsAlignmentAgent();
+  private readonly requirementsAlignmentAgent =
+    new RequirementsAlignmentAgent();
 
   // Doel: Confluence en Figma context ophalen en laten beoordelen op alignment
   async evaluate(params: {

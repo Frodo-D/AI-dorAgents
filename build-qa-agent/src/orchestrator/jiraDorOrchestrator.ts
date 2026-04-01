@@ -20,6 +20,7 @@ import type {
 import { buildConfluenceQueries } from "../utils/confluenceQueryBuilder.js";
 import { extractFigmaLinks } from "../utils/figmaLinkParser.js";
 import { FinalDorAssessmentSchema } from "../schemas/finalAssessmentSchema.js";
+import { extractConfluencePageIds } from "../utils/confluenceLinkParser.js";
 
 // Doel: debug logging centraal aan/uit kunnen zetten
 const DEBUG = true;
@@ -78,6 +79,7 @@ export class JiraDorOrchestrator {
       riskScore: risk.score,
       riskReason: risk.reason,
       testScenarios,
+      consultedSources: context.consultedSources,
     };
 
     console.log("[orchestrator] result opgebouwd");
@@ -86,65 +88,108 @@ export class JiraDorOrchestrator {
     return FinalDorAssessmentSchema.parse(result);
   }
 
-  // Verzamelt en combineert context uit Jira, Confluence en Figma.
-  // Dit is de brug tussen externe systemen en de AI-agents.
+  // Doel: DoR context opbouwen op basis van Jira en alleen expliciet gelinkte externe bronnen
   private async collectContext(
     issueKey: string,
   ): Promise<DorEvaluationContext> {
+    console.log("[collectContext] Jira ophalen");
     const jira = await getJiraIssue(issueKey);
+    console.log("[collectContext] Jira opgehaald:", jira.key);
 
-    const confluenceQueries = buildConfluenceQueries(jira);
-    const confluenceResults: ConfluenceSourcePage[] = [];
+    // Doel: expliciet gelinkte Confluence pagina's uit description/comments halen
+    const linkedConfluencePageIds = [
+      ...extractConfluencePageIds(jira.description),
+      ...jira.comments.flatMap((comment) => extractConfluencePageIds(comment)),
+    ];
 
-    // Doel: Confluence-fouten opvangen zodat de beoordeling toch door kan gaan
-    for (const query of confluenceQueries.slice(0, 3)) {
+    console.log(
+      "[collectContext] gevonden Confluence page IDs uit ticket:",
+      linkedConfluencePageIds,
+    );
+
+    const linkedConfluence = [];
+
+    for (const pageId of linkedConfluencePageIds) {
       try {
-        const pages = await searchConfluencePages(query);
-        confluenceResults.push(...pages);
+        console.log(
+          "[collectContext] directe Confluence page ophalen:",
+          pageId,
+        );
+        const page = await getConfluencePage(pageId);
+
+        linkedConfluence.push({
+          id: page.id,
+          title: page.title,
+          url: page.url,
+          body: page.body ?? "",
+        });
       } catch (error) {
-        console.warn("Confluence search mislukt voor query:", query, error);
+        console.warn(
+          "[collectContext] directe Confluence page ophalen mislukt:",
+          pageId,
+          error,
+        );
       }
     }
 
-    const uniquePages = dedupeById(confluenceResults).slice(0, 3);
-
-    const confluence = await Promise.all(
-      uniquePages.map((page) => getConfluencePage(page.id)),
+    console.log(
+      "[collectContext] geraadpleegde Confluence pagina's:",
+      linkedConfluence.map((page) => ({
+        id: page.id,
+        title: page.title,
+      })),
     );
 
+    // Doel: expliciet gelinkte Figma refs uit description/comments halen
     const figmaLinks = [
       ...extractFigmaLinks(jira.description),
       ...jira.comments.flatMap((comment) => extractFigmaLinks(comment)),
-      ...confluence.flatMap((page) => extractFigmaLinks(page.body ?? "")),
     ];
 
-    const figma: FigmaSourceNode[] = [];
-    const uniqueFigmaLinks = dedupeFigmaLinks(figmaLinks).slice(0, 3);
+    const uniqueFigmaLinks = dedupeFigmaLinks(figmaLinks).slice(0, 5);
 
-    // Doel: Figma-fouten opvangen zodat ontbrekende designdata niet de hele flow blokkeert
+    console.log(
+      "[collectContext] gevonden Figma refs:",
+      uniqueFigmaLinks.map((link) => ({
+        fileKey: link.fileKey,
+        nodeId: link.nodeId,
+      })),
+    );
+
+    const linkedFigma = [];
+
     for (const link of uniqueFigmaLinks) {
       try {
-        if (link.nodeId) {
-          figma.push(await getFigmaNode(link.fileKey, link.nodeId));
-        } else {
-          figma.push(await getFigmaFile(link.fileKey));
-        }
+        console.log("[collectContext] Figma ophalen:", link);
+
+        const figmaItem = link.nodeId
+          ? await getFigmaNode(link.fileKey, link.nodeId)
+          : await getFigmaFile(link.fileKey);
+
+        linkedFigma.push({
+          fileKey: link.fileKey,
+          nodeId: link.nodeId,
+          name: figmaItem.name,
+          type: figmaItem.type,
+        });
       } catch (error) {
-        console.warn("Figma ophalen mislukt:", link, error);
+        console.warn("[collectContext] Figma ophalen mislukt:", link, error);
       }
     }
 
-    // Doel: zichtbaar maken welke context per bron is opgehaald
-    if (DEBUG) {
-      console.log("Jira issue:", jira.key);
-      console.log("Aantal Confluence pagina's:", confluence.length);
-      console.log("Aantal Figma items:", figma.length);
-    }
+    console.log("[collectContext] geraadpleegde Figma items:", linkedFigma);
 
     return {
       jira,
-      confluence,
-      figma,
+      linkedConfluence,
+      linkedFigma,
+      consultedSources: {
+        jira: jira.key,
+        confluence: linkedConfluence.map((page) => `${page.id}: ${page.title}`),
+        figma: linkedFigma.map(
+          (item) => `${item.fileKey}${item.nodeId ? `#${item.nodeId}` : ""}`,
+        ),
+      },
     };
   }
 

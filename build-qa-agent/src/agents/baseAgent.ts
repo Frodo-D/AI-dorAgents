@@ -29,7 +29,7 @@ export abstract class BaseAgent {
   constructor(
     protected readonly agentName: string,
     protected readonly systemPrompt: string,
-    protected readonly model = "gpt-5.4-nano",
+    protected readonly model = "gpt-5-nano",
   ) {}
 
   // Voert de beoordeling uit voor één agent.

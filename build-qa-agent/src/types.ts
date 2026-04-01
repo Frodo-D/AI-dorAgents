@@ -30,6 +30,11 @@ export interface FinalDorAssessment {
   riskScore?: number;
   riskReason?: string;
   testScenarios?: TestScenario[];
+  consultedSources?: {
+    jira: string;
+    confluence: string[];
+    figma: string[];
+  };
 }
 
 // Doel: compacte, leesbare weergave van de eindbeoordeling voor console of Jira comment
@@ -82,12 +87,36 @@ export interface FigmaSourceNode {
   raw?: unknown;
 }
 
-// Complete context die naar de agents gaat.
-// Combineert Jira als hoofdbron met Confluence- en Figma-verrijking.
+// Optionele expliciet gelinkte Confluence bron voor DoR context
+export interface LinkedConfluenceRef {
+  id: string;
+  title: string;
+  url?: string;
+  body?: string;
+}
+
+// Optionele expliciet gelinkte Figma bron voor DoR context
+export interface LinkedFigmaRef {
+  fileKey: string;
+  nodeId?: string;
+  name?: string;
+  type?: string;
+}
+
+// Context voor DoR-evaluatie: primair gebaseerd op het Jira ticket zelf
 export interface DorEvaluationContext {
   jira: JiraSourceTicket;
-  confluence: ConfluenceSourcePage[];
-  figma: FigmaSourceNode[];
+
+  // Alleen expliciet gelinkte externe bronnen, geen search-based discovery
+  linkedConfluence?: LinkedConfluenceRef[];
+  linkedFigma?: LinkedFigmaRef[];
+
+  // Transparantie over welke bronnen daadwerkelijk zijn gebruikt
+  consultedSources: {
+    jira: string;
+    confluence: string[];
+    figma: string[];
+  };
 }
 
 // Gestructureerd testscenario voor QA en latere automatisering
@@ -203,8 +232,8 @@ export interface MissingStatesAssessment {
   overallStatus: MissingStatesStatus;
   summary: string;
   strengths: string[];
-  missingStates: string[];
-  partiallyDefinedStates: string[];
+  missingStates: FindingWithEvidence[];
+  partiallyDefinedStates: FindingWithEvidence[];
   inconsistentStates: string[];
   openQuestions: string[];
   recommendations: string[];
@@ -239,9 +268,85 @@ export interface MissingValidationsAssessment {
   overallStatus: MissingValidationsStatus;
   summary: string;
   strengths: string[];
-  missingValidations: string[];
-  partiallyDefinedValidations: string[];
+  missingValidations: FindingWithEvidence[];
+  partiallyDefinedValidations: FindingWithEvidence[];
   inconsistentValidations: string[];
   openQuestions: string[];
   recommendations: string[];
+}
+
+// Context voor een review van ontbrekende permissies op basis van Confluence en Figma
+export interface MissingPermissionsContext {
+  confluence: {
+    title: string;
+    body: string;
+    url?: string;
+  };
+  figma: {
+    fileKey?: string;
+    nodeId?: string;
+    name?: string;
+    type?: string;
+    summary?: string;
+    raw?: unknown;
+    url?: string;
+  }[];
+}
+
+// Status voor de dekking van permissies en rolgedrag
+export type MissingPermissionsStatus =
+  | "PERMISSION_COVERAGE_GOOD"
+  | "PERMISSION_COVERAGE_PARTIAL"
+  | "PERMISSION_COVERAGE_POOR";
+
+// Resultaat van een permission-focused review
+export interface MissingPermissionsAssessment {
+  overallStatus: MissingPermissionsStatus;
+  summary: string;
+  strengths: string[];
+  missingPermissions: FindingWithEvidence[];
+  partiallyDefinedPermissions: FindingWithEvidence[];
+  inconsistentPermissions: string[];
+  openQuestions: string[];
+  recommendations: string[];
+}
+
+// Gecombineerd resultaat van meerdere pre-ticket review agents
+export interface CombinedRequirementsReview {
+  executiveSummary: string;
+  overallStatus:
+    | "READY_FOR_TICKET_CREATION"
+    | "PARTIALLY_READY_FOR_TICKET_CREATION"
+    | "NOT_READY_FOR_TICKET_CREATION";
+  keyRisks: string[];
+  recommendations: string[];
+
+  completeness: RequirementsCompletenessAssessment;
+  alignment: RequirementsAlignmentAssessment;
+  missingStates: MissingStatesAssessment;
+  missingValidations: MissingValidationsAssessment;
+  missingPermissions: MissingPermissionsAssessment;
+}
+
+// Samenvattende QA-beoordeling op basis van een gecombineerde requirements review
+export interface QAReviewSummary {
+  overallQaReadiness: "READY" | "PARTIAL" | "BLOCKED";
+  executiveSummary: string;
+  topQaRisks: string[];
+  clarificationPoints: string[];
+  testPreparationNotes: string[];
+  recommendedQaFocus: string[];
+}
+
+export interface EvidenceReference {
+  sourceType: "jira" | "confluence" | "figma" | "derived";
+  sourceId: string;
+  sourceLabel: string;
+  snippet?: string;
+  reason: string;
+}
+
+export interface FindingWithEvidence {
+  text: string;
+  evidence: EvidenceReference[];
 }

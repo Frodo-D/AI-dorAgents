@@ -7,7 +7,10 @@
     "requirements-review": "tsx src/requirementsReview.ts",
     "requirements-completeness-review": "tsx src/requirementsCompletenessReview.ts",
     "missing-states-review": "tsx src/missingStatesReview.ts",
-    "missing-validations-review": "tsx src/missingValidationsReview.ts"
+    "missing-validations-review": "tsx src/missingValidationsReview.ts",
+    "missing-permissions-review": "tsx src/missingPermissionsReview.ts",
+    "combined-requirements-review": "tsx src/combinedRequirementsReview.ts",
+    "qa-review-summary": "tsx src/qaReviewSummary.ts"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",

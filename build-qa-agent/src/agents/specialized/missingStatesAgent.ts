@@ -8,7 +8,7 @@ import { loadPrompt } from "../../utils/promptLoader.js";
 
 // Doel: gespecialiseerde agent die ontbrekende of inconsistente states analyseert op basis van Confluence en Figma
 export class MissingStatesAgent {
-  constructor(private readonly model = "gpt-5.2") {}
+  constructor(private readonly model = "gpt-5-nano") {}
 
   // Doel: state coverage en state consistency beoordelen
   async assess(
@@ -33,7 +33,25 @@ export class MissingStatesAgent {
 
     try {
       const json = JSON.parse(text);
-      return MissingStatesAssessmentSchema.parse(json);
+      const parsed = MissingStatesAssessmentSchema.parse(json);
+
+      console.log(
+        "[MissingStatesAgent] parsed missingStates:",
+        parsed.missingStates.map((item) => ({
+          text: item.text,
+          evidenceCount: item.evidence.length,
+        })),
+      );
+
+      console.log(
+        "[MissingStatesAgent] parsed partiallyDefinedStates:",
+        parsed.partiallyDefinedStates.map((item) => ({
+          text: item.text,
+          evidenceCount: item.evidence.length,
+        })),
+      );
+
+      return parsed;
     } catch (error) {
       throw new Error(
         [

@@ -127,7 +127,9 @@ Leesbare output in terminal
 ## Agents runnen
 
 DoR agent
+
 - pnpm run dev {Jira-ticket nummer} (bijvoorbeeld TONM-137)
 
 requirement agent
+
 - pnpm run requirements-review {confluence page ID} {Figma file key} {figma node ID}

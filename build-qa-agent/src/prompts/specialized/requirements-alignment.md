@@ -51,6 +51,7 @@ Return ONLY valid JSON in exactly this structure:
   "contradictions": ["string"]
 }
 ```
+
 ## Guidelines
 
 - Use "requirementsNotRepresentedInDesign" only for requirements that exist in Confluence but are not clearly reflected in Figma

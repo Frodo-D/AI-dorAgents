@@ -13,22 +13,22 @@ const FindingWithEvidenceSchema = z.object({
   evidence: z.array(EvidenceReferenceSchema),
 });
 
-// Doel: validatie van de output van de MissingStatesAgent
-export const MissingStatesAssessmentSchema = z.object({
+// Doel: validatie van de output van de MissingPermissionsAgent
+export const MissingPermissionsAssessmentSchema = z.object({
   overallStatus: z.enum([
-    "STATE_COVERAGE_GOOD",
-    "STATE_COVERAGE_PARTIAL",
-    "STATE_COVERAGE_POOR",
+    "PERMISSION_COVERAGE_GOOD",
+    "PERMISSION_COVERAGE_PARTIAL",
+    "PERMISSION_COVERAGE_POOR",
   ]),
   summary: z.string(),
   strengths: z.array(z.string()),
-  missingStates: z.array(FindingWithEvidenceSchema),
-  partiallyDefinedStates: z.array(FindingWithEvidenceSchema),
-  inconsistentStates: z.array(z.string()),
+  missingPermissions: z.array(FindingWithEvidenceSchema),
+  partiallyDefinedPermissions: z.array(FindingWithEvidenceSchema),
+  inconsistentPermissions: z.array(z.string()),
   openQuestions: z.array(z.string()),
   recommendations: z.array(z.string()),
 });
 
-export type ParsedMissingStatesAssessment = z.infer<
-  typeof MissingStatesAssessmentSchema
+export type ParsedMissingPermissionsAssessment = z.infer<
+  typeof MissingPermissionsAssessmentSchema
 >;
