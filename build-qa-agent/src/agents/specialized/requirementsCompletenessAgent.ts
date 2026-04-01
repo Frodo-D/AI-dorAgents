@@ -8,7 +8,7 @@ import { loadPrompt } from "../../utils/promptLoader.js";
 
 // Doel: gespecialiseerde agent die alleen de volledigheid van Confluence requirements beoordeelt
 export class RequirementsCompletenessAgent {
-  constructor(private readonly model = "gpt-5.4-nano") {}
+  constructor(private readonly model = "gpt-5-nano") {}
 
   // Doel: Confluence requirements beoordelen op volledigheid en bruikbaarheid
   async assess(

@@ -14,12 +14,12 @@ Het doel van deze flow is om inzichtelijk te maken:
 ---
 
 ## Mulit flow overview
+
 Flow 1: Requirements review
 Confluence + Figma → RequirementsAlignmentAgent → review output
 
 Flow 2: Jira DoR review
 Jira + Confluence + Figma → DoR agents → assessment
-
 
 ## High-level flow Jira DoR review
 
@@ -50,3 +50,4 @@ Normalization + validation
 FinalDorAssessment
   ↓
 Readable terminal output
+```

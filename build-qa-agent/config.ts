@@ -16,7 +16,7 @@ function required(name: string): string {
 // Jira, Confluence en Figma op één plek.
 export const config = {
   openaiApiKey: required("OPENAI_API_KEY"),
-  openaiModel: process.env.OPENAI_MODEL ?? "gpt-5.4-nano",
+  openaiModel: process.env.OPENAI_MODEL ?? "gpt-5-nano",
 
   jiraBaseUrl: required("JIRA_BASE_URL"),
   jiraEmail: required("JIRA_EMAIL"),

@@ -8,7 +8,7 @@ import { loadPrompt } from "../../utils/promptLoader.js";
 
 // Doel: gespecialiseerde agent die requirements uit Confluence vergelijkt met de uitwerking in Figma
 export class RequirementsAlignmentAgent {
-  constructor(private readonly model = "gpt-5.4-nano") {}
+  constructor(private readonly model = "gpt-5-nano") {}
 
   // Doel: requirements en design vergelijken en een gestructureerde alignment review teruggeven
   async assess(

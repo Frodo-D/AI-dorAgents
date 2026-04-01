@@ -1,8 +1,10 @@
-import { RequirementsReviewOrchestrator } from "../orchestrator/requirementsReviewOrchestrator.js"
+import { RequirementsReviewOrchestrator } from "../orchestrator/requirementsReviewOrchestrator.js";
 import { RequirementsAlignmentAssessment } from "../types.js";
 
 // Doel: requirements review resultaat leesbaar tonen in de terminal
-function printRequirementsReviewResult(result: RequirementsAlignmentAssessment) {
+function printRequirementsReviewResult(
+  result: RequirementsAlignmentAssessment,
+) {
   console.log("\n==============================");
   console.log("REQUIREMENTS REVIEW");
   console.log("==============================\n");

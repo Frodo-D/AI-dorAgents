@@ -1,28 +1,28 @@
 import { getConfluencePage } from "../connectors/confluence.js";
 import { getFigmaFile, getFigmaNode } from "../connectors/figma.js";
-import { MissingStatesAgent } from "../agents/specialized/missingStatesAgent.js";
+import { MissingPermissionsAgent } from "../agents/specialized/missingPermissionsAgent.js";
 import type {
-  MissingStatesAssessment,
-  MissingStatesContext,
+  MissingPermissionsAssessment,
+  MissingPermissionsContext,
 } from "../types.js";
 
-// Doel: orchestrator voor state-focused review op basis van Confluence en Figma
-export class MissingStatesOrchestrator {
-  private readonly missingStatesAgent = new MissingStatesAgent();
+// Doel: orchestrator voor permission-focused review op basis van Confluence en Figma
+export class MissingPermissionsOrchestrator {
+  private readonly missingPermissionsAgent = new MissingPermissionsAgent();
 
-  // Doel: Confluence en Figma ophalen en laten beoordelen op ontbrekende states
+  // Doel: Confluence en Figma ophalen en laten beoordelen op ontbrekende permissies
   async evaluate(params: {
     confluencePageId: string;
     figmaFileKey?: string;
     figmaNodeId?: string;
-  }): Promise<MissingStatesAssessment> {
-    console.log("[MissingStatesOrchestrator] gestart");
+  }): Promise<MissingPermissionsAssessment> {
+    console.log("[MissingPermissionsOrchestrator] gestart");
 
     const context = await this.collectContext(params);
-    console.log("[MissingStatesOrchestrator] context opgehaald");
+    console.log("[MissingPermissionsOrchestrator] context opgehaald");
 
-    const result = await this.missingStatesAgent.assess(context);
-    console.log("[MissingStatesOrchestrator] beoordeling klaar");
+    const result = await this.missingPermissionsAgent.assess(context);
+    console.log("[MissingPermissionsOrchestrator] beoordeling klaar");
 
     return result;
   }
@@ -32,7 +32,7 @@ export class MissingStatesOrchestrator {
     confluencePageId: string;
     figmaFileKey?: string;
     figmaNodeId?: string;
-  }): Promise<MissingStatesContext> {
+  }): Promise<MissingPermissionsContext> {
     const confluencePage = await getConfluencePage(params.confluencePageId);
 
     const figma = [];

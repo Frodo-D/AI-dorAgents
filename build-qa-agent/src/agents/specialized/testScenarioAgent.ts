@@ -91,7 +91,9 @@ function determineAutomationCandidateReason(scenario: TestScenario): string {
 }
 
 // Doel: scenario automatisch indelen in smoke, regression of exploratory follow-up
-function determineTestSuite(scenario: TestScenario): "smoke" | "regression" | "exploratory_follow_up" {
+function determineTestSuite(
+  scenario: TestScenario,
+): "smoke" | "regression" | "exploratory_follow_up" {
   const title = scenario.title.toLowerCase();
   const notes = scenario.notes?.toLowerCase() ?? "";
 
@@ -128,7 +130,7 @@ function determineTestSuite(scenario: TestScenario): "smoke" | "regression" | "e
 
 // Doel: gespecialiseerde agent die gestructureerde testscenario's genereert
 export class TestScenarioAgent {
-  constructor(private readonly model = "gpt-5.4-nano") {}
+  constructor(private readonly model = "gpt-5-nano") {}
 
   // Doel: op basis van context een lijst met gestructureerde testscenario's genereren en valideren
   async assess(context: DorEvaluationContext): Promise<TestScenario[]> {
@@ -151,7 +153,7 @@ export class TestScenarioAgent {
 
     try {
       const json = JSON.parse(text);
-            const parsed = TestScenarioListSchema.parse(json);
+      const parsed = TestScenarioListSchema.parse(json);
 
       // Doel: automationCandidate, reden en testSuite consistent maken op basis van vaste regels
       const normalized = parsed.map((scenario) => {
@@ -180,7 +182,7 @@ export class TestScenarioAgent {
           "Ontvangen output:",
           text,
           `Technische fout: ${String(error)}`,
-        ].join("\n\n")
+        ].join("\n\n"),
       );
     }
   }

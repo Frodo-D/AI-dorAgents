@@ -14,6 +14,13 @@ export const FinalDorAssessmentSchema = z.object({
   riskScore: z.number().optional(),
   riskReason: z.string().optional(),
   testScenarios: z.array(TestScenarioSchema).optional(),
+  consultedSources: z
+    .object({
+      jira: z.string(),
+      confluence: z.array(z.string()),
+      figma: z.array(z.string()),
+    })
+    .optional(),
 });
 
 export type ParsedFinalDorAssessment = z.infer<typeof FinalDorAssessmentSchema>;
